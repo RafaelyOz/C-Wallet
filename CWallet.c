@@ -5,9 +5,13 @@
 #include <ctype.h>
 
 #ifdef _WIN32
-#define CLEAR_SCREEN "cls"
+    #define CLEAR_SCREEN "cls"
 #else
-#define CLEAR_SCREEN "clear"
+    #define CLEAR_SCREEN "clear"
+#endif
+
+#ifdef _WIN32
+    #include <windows.h>
 #endif
 
 #define MAX_CLIENTES 100
@@ -19,7 +23,7 @@ struct cliente
     char nome[MAX_NOME + 1];
     int idade;
     char cpf[MAX_CPF + 1];
-    char conta;
+    int conta;
     int numero_conta;
     float saldo;
     char status;
@@ -29,6 +33,13 @@ typedef struct cliente cliente;
 
 cliente clientes[MAX_CLIENTES];
 int num_clientes = 0;
+
+void cabecalho() {
+    for(int i = 0; i < 40; i++) {
+        printf("-");
+    }
+    printf("\n");
+}
 
 void inserirCliente()
 {
@@ -40,26 +51,26 @@ void inserirCliente()
 
     cliente novoCliente;
 
-    printf("Informe o nome completo (max %i caracteres):\n", MAX_NOME);
-    scanf(" %50[^\n]s", &novoCliente.nome);
+    printf("Digite o nome completo (max %i caracteres): ", MAX_NOME);
+    scanf(" %50[^\n]", novoCliente.nome);
 
-    printf("Informe a idade\n");
+    printf("Digite a idade: ");
     scanf("%i", &(novoCliente.idade));
     getchar();
-     if (novoCliente.idade < 18)
-    {
-        printf("cliente precisa ser maior de idade\n");
+
+    if (novoCliente.idade < 18) {
+        printf("ATENÇÃO! Cliente precisa ser maior de idade!\n");
         return;
     }
 
-    printf("informe o CPF\n");
+    printf("Digite o CPF: ");
     scanf("%12[^\n]", novoCliente.cpf);
 
     for (int i = 0; i < num_clientes; i++)
     {
         if (strcmp(clientes[i].cpf, novoCliente.cpf) == 0)
         {
-            printf("Cliente ja cadastrado\n");
+            printf("ATENÇÃO! Cliente ja cadastrado!\n");
             return;
         }
     }
@@ -67,10 +78,12 @@ void inserirCliente()
     clientes[num_clientes] = novoCliente;
     num_clientes++;
 
-    printf("Escolha o tipo da Conta:\n");
+    cabecalho();
     printf("1 - Conta Corrente\n");
     printf("2 - Conta Poupanca\n");
-    scanf("%i", &novoCliente.conta);
+    cabecalho();
+    printf("Escolha o tipo da Conta: ");
+    scanf("%d", &novoCliente.conta);
 
     if (novoCliente.conta == 1)
     {
@@ -82,7 +95,7 @@ void inserirCliente()
     }
     else
     {
-        printf("tipo de conta invalida\n");
+        printf("ERRO!! Tipo de conta invalida!\n");
         return;
     }
 
@@ -90,56 +103,84 @@ void inserirCliente()
     novoCliente.status = 'A';
     novoCliente.saldo = 0.0;
 
-    printf("Conta criada! numero da conta %i\n", novoCliente.numero_conta);
+    printf("Conta criada! Número da conta: %i\n", novoCliente.numero_conta);
 }
 
-int main()
-{
+void listarClientes() {
+    if (num_clientes == 0) {
+        printf("Nenhum cliente cadastrado! \n");
+        return;
+    }
 
-    while (1)
-    {
+    printf("Lista de Clientes:\n");
+    printf("| %-4s | %-20s | %-5s | %-12s | %-15s | %-7s | %-6s | %-6s |\n",
+           "Num", "Nome", "Idade", "CPF", "Tipo de Conta", "Status", "Saldo", "Nº Conta");
+    printf("|------|----------------------|-------|--------------|-----------------|---------|--------|--------|\n");
 
-        printf("\n Menu Principal: \n");
-        printf("1 - Abrir Conta\n");
-        printf("2 - Listar Clientes\n");
-        printf("3 - Fazer Deposito\n");
-        printf("4 - Fazer Saque\n");
-        printf("5 - Fechar Conta\n");
-        printf("6 - Fazer Emprestimo\n");
-        printf("0 - Sair\n");
+    for (int i = 0; i < num_clientes; i++) {
+        printf("| %-4d | %-20s | %-5d | %-12s | %-15s | %-7c | %-6.2f | %-6d |\n",
+               i + 1, clientes[i].nome, clientes[i].idade, clientes[i].cpf,
+               clientes[i].conta == 1 ? "Conta Corrente" : "Conta Poupança",
+               clientes[i].status, clientes[i].saldo, clientes[i].numero_conta);
+    }
+}
+
+int menu() {
+    while(1) {
+        cabecalho();
+        printf("       SEJA BEM VINDO AO C-WALLET\n");
+        cabecalho();
+
+        printf("1 | Abrir Conta\n");
+        printf("2 | Listar Clientes\n");
+        printf("3 | Fazer Depósito\n");
+        printf("4 | Fazer Saque\n");
+        printf("5 | Fechar Conta\n");
+        printf("6 | Fazer Empréstimo\n");
+        printf("0 | Sair\n");
+
+        printf("Digite uma opção: "); 
 
         int opcao;
         scanf("%i", &opcao);
 
-        switch (opcao)
-        {
-        case 1:
-            inserirCliente();
+        switch (opcao) {
+            case 1:
+                inserirCliente();
+                break;
+            case 2:
+                listarClientes();
+                break;
+            case 3:
 
-            break;
-        case 2:
+                break;
+            case 4:
 
-            break;
-        case 3:
+                break;
+            case 5:
 
-            break;
-        case 4:
+                break;
+            case 6:
 
-            break;
-        case 5:
+                break;
+            case 0:
+                return 0;
 
-            break;
-        case 6:
-
-            break;
-        case 0:
-            return 0;
-
-        default:
-            printf("opcao invalida, tente novamente\n");
-            break;
+            default:
+                printf("opcao invalida, tente novamente\n");
+                break;
         }
     }
+    
+}
+
+int main()
+{
+    #ifdef _WIN32
+        SetConsoleOutputCP(65001);
+    #endif
+
+    menu();
 
     return 0;
 }
