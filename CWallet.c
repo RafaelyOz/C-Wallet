@@ -41,6 +41,43 @@ void cabecalho() {
     printf("\n");
 }
 
+void fazerDeposito() {
+    int numero_conta;
+    float valor;
+
+    printf("Digite o número da conta: ");
+    scanf("%d", &numero_conta);
+
+    int indice_cliente = -1;
+
+    for (int i = 0; i < num_clientes; i++) {
+        if (clientes[i].numero_conta == numero_conta) {
+            indice_cliente = i;
+            break;
+        }
+    }
+
+    if (indice_cliente == -1) {
+        cabecalho();
+        printf("ATENÇÂO!! Conta não encontrada! \n");
+        return;
+    }
+
+    cabecalho();
+    printf("Digite o valor a ser depositado: ");
+    scanf("%f", &valor);
+
+    if(valor <= 0) {
+        cabecalho();
+        printf("ATENÇÃO!! O valor do depósito deve ser positivo! \n");
+        return;
+    }
+
+    clientes[indice_cliente].saldo += valor;
+
+    printf("Depósito realizado com sucesso! Saldo atual: %.2f\n", clientes[indice_cliente].saldo);
+}
+
 void inserirCliente()
 {
     if (num_clientes >= MAX_CLIENTES)
@@ -75,9 +112,6 @@ void inserirCliente()
         }
     }
 
-    clientes[num_clientes] = novoCliente;
-    num_clientes++;
-
     cabecalho();
     printf("1 - Conta Corrente\n");
     printf("2 - Conta Poupanca\n");
@@ -103,6 +137,9 @@ void inserirCliente()
     novoCliente.status = 'A';
     novoCliente.saldo = 0.0;
 
+    clientes[num_clientes] = novoCliente;
+    num_clientes++;
+
     printf("Conta criada! Número da conta: %i\n", novoCliente.numero_conta);
 }
 
@@ -119,7 +156,7 @@ void listarClientes() {
 
     for (int i = 0; i < num_clientes; i++) {
         printf("| %-4d | %-20s | %-5d | %-12s | %-15s | %-7c | %-6.2f | %-6d |\n",
-               i + 1, clientes[i].nome, clientes[i].idade, clientes[i].cpf,
+               i, clientes[i].nome, clientes[i].idade, clientes[i].cpf,
                clientes[i].conta == 1 ? "Conta Corrente" : "Conta Poupança",
                clientes[i].status, clientes[i].saldo, clientes[i].numero_conta);
     }
@@ -152,7 +189,7 @@ int menu() {
                 listarClientes();
                 break;
             case 3:
-
+                fazerDeposito();
                 break;
             case 4:
 
