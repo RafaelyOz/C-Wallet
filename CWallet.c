@@ -41,6 +41,48 @@ void cabecalho() {
     printf("\n");
 }
 
+void fazerSaque() {
+    int numero_conta;
+    float valor;
+
+    printf("Digite o número da conta: ");
+    scanf("%d", &numero_conta);
+
+    int indice_cliente = -1;
+
+    for (int i = 0; i < num_clientes; i++) {
+        if (clientes[i].numero_conta == numero_conta) {
+            indice_cliente = i;
+            break;
+        }
+    }
+
+    if (indice_cliente == -1) {
+        cabecalho();
+        printf("ATENÇÂO!! Conta não encontrada! \n");
+        return;
+    }
+
+    cabecalho();
+    printf("Digite o valor a ser sacado: ");
+    scanf("%f", &valor);
+
+    if (valor <= 0) {
+        cabecalho();
+        printf("ATENÇÃO!! O valor do saque deve ser positivo!\n");
+        return;
+    }
+
+    if (clientes[indice_cliente].saldo < valor) {
+        printf("ATENÇÃO!! Não foi possível realizar o saque, saldo insuficiente...\n");
+        return;
+    }
+
+    clientes[indice_cliente].saldo -= valor;
+
+    printf("Saque realizado com sucesso! Saldo atual: %.2f\n", clientes[indice_cliente].saldo);
+}
+
 void fazerDeposito() {
     int numero_conta;
     float valor;
@@ -78,10 +120,8 @@ void fazerDeposito() {
     printf("Depósito realizado com sucesso! Saldo atual: %.2f\n", clientes[indice_cliente].saldo);
 }
 
-void inserirCliente()
-{
-    if (num_clientes >= MAX_CLIENTES)
-    {
+void inserirCliente() {
+    if (num_clientes >= MAX_CLIENTES) {
         printf("Número máximo de clientes atingido.\n");
         return;
     }
@@ -101,10 +141,9 @@ void inserirCliente()
     }
 
     printf("Digite o CPF: ");
-    scanf("%12[^\n]", novoCliente.cpf);
+    scanf("%11[^\n]", novoCliente.cpf);
 
-    for (int i = 0; i < num_clientes; i++)
-    {
+    for (int i = 0; i < num_clientes; i++) {
         if (strcmp(clientes[i].cpf, novoCliente.cpf) == 0)
         {
             printf("ATENÇÃO! Cliente ja cadastrado!\n");
@@ -133,7 +172,7 @@ void inserirCliente()
         return;
     }
 
-    novoCliente.numero_conta = num_clientes;
+    novoCliente.numero_conta = rand() % 1000000;
     novoCliente.status = 'A';
     novoCliente.saldo = 0.0;
 
@@ -156,8 +195,8 @@ void listarClientes() {
 
     for (int i = 0; i < num_clientes; i++) {
         printf("| %-4d | %-20s | %-5d | %-12s | %-15s | %-7c | %-6.2f | %-6d |\n",
-               i, clientes[i].nome, clientes[i].idade, clientes[i].cpf,
-               clientes[i].conta == 1 ? "Conta Corrente" : "Conta Poupança",
+               i + 1, clientes[i].nome, clientes[i].idade, clientes[i].cpf,
+               clientes[i].conta == 1 ? "Conta Corrente" : "Conta Poupança ",
                clientes[i].status, clientes[i].saldo, clientes[i].numero_conta);
     }
 }
@@ -192,7 +231,7 @@ int menu() {
                 fazerDeposito();
                 break;
             case 4:
-
+                fazerSaque();
                 break;
             case 5:
 
